@@ -47,7 +47,7 @@ export default function JoinScreen() {
   };
 
   return (
-    <section className={styles.joinScreen}>
+    <div className={styles.joinScreen}>
       <h1>Join Super Bowl Squares</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="playerName">Name: </label>
@@ -66,6 +66,6 @@ export default function JoinScreen() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
-    </section>
+    </div>
   );
 }
