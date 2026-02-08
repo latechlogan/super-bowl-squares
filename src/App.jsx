@@ -1,17 +1,38 @@
 import styles from "./App.module.css";
-import { useEffect } from "react";
-import { testFirebaseConnection } from "./firebase/config";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import JoinScreen from "./components/JoinScreen";
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    testFirebaseConnection();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  });
+
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <h1>Super Bowl Squares</h1>
-      <p>Check console for Firebase connection status</p>
-    </div>
+    <section>
+      {!user ? (
+        <JoinScreen />
+      ) : (
+        <div>
+          <h2>Welcome, {user.displayName}!</h2>
+          <p>Waiting for game to start...</p>
+          <p>
+            <small>User ID: {user.uid}</small>
+          </p>
+        </div>
+      )}
+    </section>
   );
 }
 
