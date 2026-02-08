@@ -2,22 +2,28 @@ import styles from "./App.module.css";
 import { useEffect, useState } from "react";
 import { auth } from "./firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
-import JoinScreen from "./components/JoinScreen";
+import { useGameState } from "./hooks/useGameState";
+import JoinScreen from "./components/JoinScreen/JoinScreen.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const { gameState, loading: gameLoading, error } = useGameState();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setAuthLoading(false);
     });
 
     return unsubscribe;
   });
 
-  if (loading) return <div>Loading...</div>;
+  if (authLoading || gameLoading) return <div>Loading...</div>;
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <section>
@@ -26,10 +32,17 @@ function App() {
       ) : (
         <div>
           <h2>Welcome, {user.displayName}!</h2>
-          <p>Waiting for game to start...</p>
-          <p>
-            <small>User ID: {user.uid}</small>
-          </p>
+          <p>Game Phase: {gameState?.gamePhase || "Not started"}</p>
+
+          <h3>Players ({gameState?.players?.length || 0}):</h3>
+          <ul>
+            {gameState?.players?.map((player) => {
+              <li key={player}>{player}</li>;
+            })}
+          </ul>
+
+          <h3>Debug Info:</h3>
+          <pre>{JSON.stringify(gameState, null, 2)}</pre>
         </div>
       )}
     </section>
