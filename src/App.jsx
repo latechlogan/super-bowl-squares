@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useGameState } from "./hooks/useGameState";
 import JoinScreen from "./components/JoinScreen/JoinScreen.jsx";
 import AdminPanel from "./components/AdminPanel/AdminPanel.jsx";
+import Board from "./components/Board/Board.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,14 +40,19 @@ function App() {
     return <AdminPanel />;
   }
 
+  const gamePhase = gameState?.gamePhase;
+  const isDraftingOrFinished = gamePhase === "drafting" || gamePhase === "finished";
+
   return (
     <div>
       {!user ? (
         <JoinScreen />
+      ) : isDraftingOrFinished ? (
+        <Board />
       ) : (
         <div>
           <h2>Welcome, {user.displayName}!</h2>
-          <p>Game Phase: {gameState?.gamePhase || "Not started"}</p>
+          <p>Game Phase: {gamePhase || "Not started"}</p>
 
           <h3>Players ({gameState?.players?.length || 0}):</h3>
           <ul>
@@ -54,9 +60,6 @@ function App() {
               return <li key={player}>{player}</li>;
             })}
           </ul>
-
-          {/* Secret admin link */}
-          <button onClick={() => setShowAdmin(true)}>Admin Panel</button>
         </div>
       )}
     </div>
