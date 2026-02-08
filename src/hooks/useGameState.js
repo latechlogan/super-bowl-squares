@@ -13,6 +13,7 @@ export function useGameState() {
     const unsubscribe = onSnapshot(
       gameRef,
       (docSnapshot) => {
+        console.log("🔥 onSnapshot fired!", docSnapshot.data());
         if (docSnapshot.exists()) {
           setGameState({
             id: docSnapshot.id,
@@ -32,7 +33,7 @@ export function useGameState() {
     );
 
     return unsubscribe;
-  });
+  }, []);
 
   return { gameState, loading, error };
 }
